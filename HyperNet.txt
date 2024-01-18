@@ -1,0 +1,457 @@
+PS H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main> python pyiqa/train.py -opt options/train/HyperNet/train_HyperNet.yml
+Disable distributed.
+Path already exists. Rename it to H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\004_HyperNet_KonIQ10k_archived_20230529_194514
+Path already exists. Rename it to H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\tb_logger_archived\004_HyperNet_KonIQ10k_archived_20230529_194514
+2023-05-29 19:45:14,514 INFO: 
+Version Information: 
+        PyTorch: 1.13.1+cu117
+        TorchVision: 0.14.1+cu117
+2023-05-29 19:45:14,514 INFO: 
+  name: 004_HyperNet_KonIQ10k
+  model_type: HyperNetModel
+  num_gpu: 1
+  manual_seed: 123
+  datasets:[
+    train:[
+      name: koniq10k
+      type: GeneralNRDataset
+      dataroot_target: ./datasets/zdjecia_uczenie
+      meta_info_file: ./datasets/meta_info/oceny_zdjec.csv
+      mos_max: 100
+      augment:[
+        hflip: True
+        random_crop: 224
+      ]
+      img_range: 1
+      use_shuffle: True
+      num_worker_per_gpu: 4
+      batch_size_per_gpu: 96
+      dataset_enlarge_ratio: 1
+      prefetch_mode: None
+      phase: train
+    ]
+    val:[
+      name: koniq10k
+      type: GeneralNRDataset
+      3dataroot_target: ./datasets/koniq10k/512x384
+      dataroot_target: ./datasets/zdjecia_uczenie
+      meta_info_file: ./datasets/meta_info/oceny_zdjec.csv
+      mos_max: 100
+      num_worker_per_gpu: 4
+      batch_size_per_gpu: 8
+      phase: val
+    ]
+  ]
+  network:[
+    type: HyperNet
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\004_HyperNet_KonIQ10k
+    models: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\004_HyperNet_KonIQ10k\models
+    training_states: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\004_HyperNet_KonIQ10k\training_states
+    log: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\004_HyperNet_KonIQ10k
+    visualization: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\004_HyperNet_KonIQ10k\visualization
+  ]
+  train:[
+    optim:[
+      type: Adam
+      lr_basemodel: 2e-05
+      lr_hypermodule: 0.0002
+      lr: 0.0002
+      weight_decay: 0.0005
+    ]
+    scheduler:[
+      type: MultiStepLR
+      milestones: [5, 10]
+      gamma: 0.1
+    ]
+    total_epoch: 15
+    warmup_iter: -1
+    mos_loss_opt:[
+      type: L1Loss
+      loss_weight: 1.0
+    ]
+  ]
+  val:[
+    val_freq: 100.0
+    save_img: False
+    pbar: True
+    key_metric: srcc
+    metrics:[
+      srcc:[
+        type: calculate_srcc
+      ]
+      plcc:[
+        type: calculate_plcc
+      ]
+      krcc:[
+        type: calculate_krcc
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 20
+    save_checkpoint_freq: 5000000000.0
+    save_latest_freq: 500.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: True
+  root_path: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main
+
+2023-05-29 19:45:14,765 INFO: Dataset [GeneralNRDataset] - koniq10k is built.
+2023-05-29 19:45:14,765 INFO: Training statistics:
+        Number of train images: 5135
+        Dataset enlarge ratio: 1
+        Batch size per gpu: 96
+        World size (gpu number): 1
+        Require iter number per epoch: 54
+        Total epochs: 15; iters: 810.
+2023-05-29 19:45:14,765 INFO: Dataset [GeneralNRDataset] - koniq10k is built.
+2023-05-29 19:45:14,765 INFO: Number of val images/folders in koniq10k: 5135
+Loading pretrained model HyperNet from C:\Users\filip\.cache\torch\hub\checkpoints\HyperIQA-resnet50-koniq10k-48579ec9.pth
+2023-05-29 19:45:15,236 INFO: Network [HyperNet] is created.
+2023-05-29 19:45:15,346 INFO: Network: HyperNet, with parameters: 27,375,369
+2023-05-29 19:45:15,346 INFO: HyperNet(
+  (base_model): FeatureListNet(
+    (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (act1): ReLU(inplace=True)
+    (maxpool): MaxPool2d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (layer1): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+        (downsample): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+    )
+    (layer2): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+        (downsample): Sequential(
+          (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (3): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+    )
+    (layer3): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+        (downsample): Sequential(
+          (0): Conv2d(512, 1024, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (3): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (4): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (5): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+    )
+    (layer4): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+        (downsample): Sequential(
+          (0): Conv2d(1024, 2048, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): ReLU(inplace=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (drop_block): Identity()
+        (act2): ReLU(inplace=True)
+        (aa): Identity()
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act3): ReLU(inplace=True)
+      )
+    )
+  )
+  (lda_modules): ModuleList(
+    (0): Sequential(
+      (0): Conv2d(256, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (1): AvgPool2d(kernel_size=7, stride=7, padding=0)
+      (2): Flatten(start_dim=1, end_dim=-1)
+      (3): Linear(in_features=1024, out_features=16, bias=True)
+    )
+    (1): Sequential(
+      (0): Conv2d(512, 32, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (1): AvgPool2d(kernel_size=7, stride=7, padding=0)
+      (2): Flatten(start_dim=1, end_dim=-1)
+      (3): Linear(in_features=512, out_features=16, bias=True)
+    )
+    (2): Sequential(
+      (0): Conv2d(1024, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (1): AvgPool2d(kernel_size=7, stride=7, padding=0)
+      (2): Flatten(start_dim=1, end_dim=-1)
+      (3): Linear(in_features=256, out_features=16, bias=True)
+    )
+    (3): Sequential(
+      (0): AvgPool2d(kernel_size=7, stride=7, padding=0)
+      (1): Flatten(start_dim=1, end_dim=-1)
+      (2): Linear(in_features=2048, out_features=176, bias=True)
+    )
+  )
+  (fc_w_modules): ModuleList(
+    (0): Conv2d(112, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(112, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): Conv2d(112, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): Flatten(start_dim=1, end_dim=-1)
+      (2): Linear(in_features=112, out_features=14, bias=True)
+    )
+    (4): Sequential(
+      (0): AdaptiveAvgPool2d(output_size=1)
+      (1): Flatten(start_dim=1, end_dim=-1)
+      (2): Linear(in_features=112, out_features=1, bias=True)
+    )
+  )
+  (conv1): Sequential(
+    (0): Conv2d(2048, 1024, kernel_size=(1, 1), stride=(1, 1))
+    (1): ReLU(inplace=True)
+    (2): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+    (3): ReLU(inplace=True)
+    (4): Conv2d(512, 112, kernel_size=(1, 1), stride=(1, 1))
+    (5): ReLU(inplace=True)
+  )
+  (global_pool): Sequential()
+)
+Loading pretrained model HyperNet from C:\Users\filip\.cache\torch\hub\checkpoints\HyperIQA-resnet50-koniq10k-48579ec9.pth
+2023-05-29 19:45:15,754 INFO: Network [HyperNet] is created.
+2023-05-29 19:45:15,801 INFO: Loss [L1Loss] is created.
+2023-05-29 19:45:15,801 INFO: Model [HyperNetModel] is created.
+2023-05-29 19:45:25,810 INFO: Start training from epoch: 0, iter: 0
+Traceback (most recent call last):
+  File "H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\pyiqa\train.py", line 242, in <module>
+    train_pipeline(root_path)
+  File "H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\pyiqa\train.py", line 180, in train_pipeline
+    model.optimize_parameters(current_iter)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\models\general_iqa_model.py", line 87, in optimize_parameters
+    self.output_score = self.net_forward(self.net)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\models\general_iqa_model.py", line 83, in net_forward
+    return net(self.img_input)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\archs\hypernet_arch.py", line 181, in forward
+    return self.forward_patch(x)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\archs\hypernet_arch.py", line 145, in forward_patch
+    base_feats = self.base_model(x)[1:]
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\timm\models\features.py", line 232, in forward
+    return list(self._collect(x).values())
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\timm\models\features.py", line 203, in _collect
+    x = module(x)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\container.py", line 204, in forward
+    input = module(input)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\timm\models\resnet.py", line 453, in forward
+    x = self.conv3(x)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\conv.py", line 463, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\torch\nn\modules\conv.py", line 459, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 74.00 MiB (GPU 0; 8.00 GiB total capacity; 7.18 GiB already allocated; 0 bytes free; 7.25 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+PS H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main> 

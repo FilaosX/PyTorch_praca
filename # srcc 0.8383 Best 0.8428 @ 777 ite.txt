@@ -1,0 +1,8 @@
+     # srcc: 0.8383 Best: 0.8428 @ 777 iter
+         # plcc: 0.8400 Best: 0.8447 @ 777 iter
+         # krcc: 0.7027 Best: 0.7074 @ 777 iter
+
+
+  # srcc: 0.8383 Best: 0.8459 @ 777 iter
+         # plcc: 0.8400 Best: 0.8450 @ 777 iter
+         # krcc: 0.7027 Best: 0.7099 @ 777 iter
