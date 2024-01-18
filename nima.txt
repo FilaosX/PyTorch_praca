@@ -1,0 +1,120 @@
+PS H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main> python pyiqa/train.py -opt options/train/NIMA/train_NIMA.yml              
+Disable distributed.
+Path already exists. Rename it to H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\debug001_NIMA_VGG16_archived_20230529_221502
+2023-05-29 22:15:02,743 INFO:
+Version Information:
+        PyTorch: 1.13.1+cu117
+        TorchVision: 0.14.1+cu117
+2023-05-29 22:15:02,743 INFO:
+  name: debug001_NIMA_VGG16
+  model_type: NIMAModel
+  num_gpu: 1
+  manual_seed: 123
+  datasets:[
+    train:[
+      name: ava
+      type: AVADataset
+      dataroot_target: ./datasets/zdjecia_uczenie
+      meta_info_file: ./datasets/meta_info/oceny_zdjec.csv
+      split_index: 1
+      augment:[
+        resize: [256, 256]
+        random_crop: 224
+        hflip: True
+      ]
+      img_range: 1
+      use_shuffle: True
+      num_worker_per_gpu: 12
+      batch_size_per_gpu: 64
+      dataset_enlarge_ratio: 1
+      prefetch_mode: cpu
+      num_prefetch_queue: 8
+      phase: train
+    ]
+    val:[
+      name: ava
+      type: AVADataset
+      dataroot_target: ./datasets/zdjecia_uczenie
+      meta_info_file: ./datasets/meta_info/oceny_zdjec.csv
+      split_index: 1
+      augment:[
+        resize: [224, 224]
+      ]
+      num_worker_per_gpu: 8
+      batch_size_per_gpu: 64
+      prefetch_mode: cpu
+      num_prefetch_queue: 8
+      phase: val
+    ]
+  ]
+  network:[
+    type: NIMA
+    base_model_name: vgg16
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\debug001_NIMA_VGG16
+    models: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\debug001_NIMA_VGG16\models
+    training_states: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\debug001_NIMA_VGG16\training_states
+    log: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\debug001_NIMA_VGG16
+    visualization: H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\experiments\debug001_NIMA_VGG16\visualization
+  ]
+  train:[
+    optim:[
+      type: Adam
+      lr_basemodel: 5e-05
+      lr_classifier: 0.0005
+      lr: 0.0001
+    ]
+    scheduler:[
+      type: MultiStepLR
+      milestones: [40000]
+      gamma: 0.1
+    ]
+    total_iter: 100000
+    warmup_iter: -1
+    mos_loss_opt:[
+      type: EMDLoss
+      loss_weight: 1.0
+    ]
+  ]
+  val:[
+    val_freq: 7
+    save_img: False
+    pbar: True
+    key_metric: srcc
+    metrics:[
+      srcc:[
+        type: calculate_srcc
+      ]
+      plcc:[
+        type: calculate_plcc
+      ]
+      krcc:[
+        type: calculate_krcc
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 1
+        Total epochs: 1235; iters: 100000.
+2023-05-29 22:15:02,754 INFO: Dataset [AVADataset] - ava is built.
+2023-05-29 22:15:02,754 INFO: Use cpu prefetch dataloader: num_prefetch_queue = 8
+2023-05-29 22:15:02,754 INFO: Number of val images/folders in ava: 5135
+Traceback (most recent call last):
+  File "H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\pyiqa\train.py", line 243, in <module>
+    train_pipeline(root_path)
+  File "H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main\pyiqa\train.py", line 136, in train_pipeline
+    model = build_model(opt)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\models\__init__.py", line 27, in build_model
+    model = MODEL_REGISTRY.get(opt['model_type'])(opt)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\models\general_iqa_model.py", line 22, in __init__
+    self.net = build_network(opt['network'])
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\archs\__init__.py", line 23, in build_network
+    net = ARCH_REGISTRY.get(network_type)(**opt)
+  File "C:\Users\filip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pyiqa\archs\nima_arch.py", line 56, in __init__
+    num_classes = 10 if 'ava' in pretrained else num_classes
+TypeError: argument of type 'bool' is not iterable
+PS H:\Politechnika rzeszowska\8 semestr\Projekt badawczy\IQA-PyTorch-main>
