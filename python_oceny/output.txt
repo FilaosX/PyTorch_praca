@@ -1,0 +1,4 @@
+__header__: b'MATLAB 5.0 MAT-file, Platform: PCWIN64, Created on: Sat Nov 07 17:22:56 2015'
+__version__: 1.0
+AllMOS_release: [[63.96340617 25.33530641 48.93656326 ... 62.66171188 87.06559249
+  72.75387093]]
