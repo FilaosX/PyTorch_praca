@@ -1,0 +1,154 @@
+# GENERATE TIME: Sat Apr 13 10:50:40 2024
+# CMD:
+# pyiqa/train.py -opt options/train/CNNIQA/train_CNNIQA.yml
+
+# general settings
+name: debug001_CNNIQA_KonIQ10k
+name: 001_CNNIQA_KonIQ10k
+model_type: GeneralIQAModel
+#model_type: BaseModel
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 123
+
+# dataset and data loader settings
+datasets:
+  train:
+    #name: koniq10k
+    name: zdjecia_uczenie
+    type: GeneralNRDataset
+    #dataroot_target: ./datasets/koniq10k/512x384
+    #meta_info_file: ./datasets/meta_info/img_name,mos.csv
+    dataroot_target: ./datasets/zdjecia_uczenie
+    meta_info_file: ./datasets/meta_info/oceny_zdjec.csv
+    #dataroot_target: ./datasets/zdjecia_uczenie_mini
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_mini.csv
+    #dataroot_target: ./datasets/zdjecia_uczenie_1024
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_1024.csv
+    #split_file: ./datasets/train_split_info/los2.pkl
+    #split_file: ./datasets/train_split_info/los10mini.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_2013baza
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec2013.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_tid2013_i.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie2008
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec2008.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_tid2008_m.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_mdid
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_mdid.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_mdid_m.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_challenge
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_bazach.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_challenge_i.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_konikQ
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_konikQ.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_konikq_i.pkl
+    split_file: ./datasets/train_split_info/podzial_zbioru_moja_baza.pkl
+
+
+    augment:
+      hflip: true
+      random_crop: 384
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: 64
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val:
+    #name: koniq10k
+    name: zdjecia_uczenie
+    type: GeneralNRDataset
+    #dataroot_target: ./datasets/koniq10k/512x384
+    #meta_info_file: ./datasets/meta_info/img_name,mos.cs
+    dataroot_target: ./datasets/zdjecia_uczenie
+    meta_info_file: ./datasets/meta_info/oceny_zdjec.csv
+    #dataroot_target: ./datasets/zdjecia_uczenie_mini
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_mini.csv
+    #dataroot_target: ./datasets/zdjecia_uczenie_1024
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_1024.csv
+    #split_file: ./datasets/train_split_info/koniq10k_official.pkl
+    #split_file: ./datasets/train_split_info/los10mini.pkl
+    #split_file: ./datasets/train_split_info/los1mini.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_2013baza
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec2013.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_tid2013_i.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie2008
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec2008.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_tid2008_m.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_mdid
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_mdid.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_mdid_m.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_challenge
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_bazach.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_challenge_i.pkl
+    #dataroot_target: ./datasets/zdjecia_uczenie_konikQ
+    #meta_info_file: ./datasets/meta_info/oceny_zdjec_konikQ.csv
+    #split_file: ./datasets/train_split_info/podzial_zbioru_konikq_i.pkl
+    split_file: ./datasets/train_split_info/podzial_zbioru_moja_baza.pkl
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: 1
+
+# network structures
+network:
+  type: CNNIQA
+
+# path
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+
+# training settings
+train:
+  optim:
+    type: AdamW
+    lr: !!float 1e-3
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [10, 20, 30, 40]
+    gamma: 0.5
+
+  total_epoch: 50
+  warmup_iter: -1  # no warm up
+
+  # losses
+  mos_loss_opt:
+    type: PLCCLoss
+    loss_weight: !!float 1.0
+
+# validation settings
+val:
+  val_freq: !!float 100
+  #val_freq: !!float 10
+  save_img: true
+  pbar: true
+
+  key_metric: srcc # if this metric improve, update all metrics. If not specified, each best metric results will be updated separately
+  metrics:
+    srcc:
+      type: calculate_srcc
+
+    plcc:
+      type: calculate_plcc
+
+    krcc:
+      type: calculate_krcc
+
+# logging settings
+logger:
+  #print_freq: 100
+  print_freq: 20
+  save_checkpoint_freq: !!float 5e9
+  save_latest_freq: !!float 5e2
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
